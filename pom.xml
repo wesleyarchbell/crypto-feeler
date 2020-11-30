@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>io.cryptofeeler</groupId>
-	<artifactId>cryptofeeler</artifactId>
+	<artifactId>crypto-feeler</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Crypto Feeler</name>
 	<description>Crypto Feeler - Crypto markets sentiment and feel aggregator</description>
@@ -19,6 +19,8 @@
 	</properties>
 
 	<dependencies>
+
+		<!-- Compile -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -31,10 +33,25 @@
 		</dependency>
 
 		<dependency>
+			<groupId>edu.stanford.nlp</groupId>
+			<artifactId>stanford-corenlp</artifactId>
+			<version>4.2.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>edu.stanford.nlp</groupId>
+			<artifactId>stanford-corenlp</artifactId>
+			<version>4.2.0</version>
+			<classifier>models</classifier>
+		</dependency>
+
+		<!-- Test -->
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
 	</dependencies>
 
 	<build>

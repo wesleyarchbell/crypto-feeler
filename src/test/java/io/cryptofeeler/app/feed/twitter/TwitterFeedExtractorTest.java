@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-class TwitterCoinFeedTest {
+class TwitterFeedExtractorTest {
 
     private static final String CREDENTIALS_PATH = "src/test/resources/twitter_credentials.json";
 
