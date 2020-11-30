@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CryptofeelerApplication {
+public class CryptoFeelerApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(CryptofeelerApplication.class, args);
+		SpringApplication.run(CryptoFeelerApplication.class, args);
 	}
 
 }

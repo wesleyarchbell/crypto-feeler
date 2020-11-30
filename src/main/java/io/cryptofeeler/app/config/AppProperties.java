@@ -6,6 +6,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AppProperties {
 
-    @Value("twitter.search.limit")
+    @Value("#{new Integer('${twitter.search.limit}')}")
     public int twitterMaxSearchLimit;
 }

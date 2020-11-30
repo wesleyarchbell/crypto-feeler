@@ -1,6 +1,7 @@
 package io.cryptofeeler.app.config;
 
 import com.github.redouane59.twitter.TwitterClient;
+import com.github.redouane59.twitter.signature.TwitterCredentials;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,7 +28,16 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public TwitterClient twitterClient() {
-        return new TwitterClient();
+    public TwitterCredentials twitterCredentials() {
+        String apiKey = System.getenv("twitterApiKey");
+        String apiSecretKey = System.getenv("twitterApiSecretKey");
+        String accessToken = System.getenv("twitterAccessToken");
+        String accessTokenSecret = System.getenv("twitterAccessTokenSecret");
+        return new TwitterCredentials(apiKey, apiSecretKey, accessToken, accessTokenSecret);
+    }
+
+    @Bean
+    public TwitterClient twitterClient(TwitterCredentials twitterCredentials) {
+        return new TwitterClient(twitterCredentials);
     }
 }
