@@ -21,7 +21,6 @@ public class TwitterFeedExtractor {
     private final TwitterClient twitterClient;
     private final AppProperties appProperties;
 
-    @Autowired
     public TwitterFeedExtractor(TwitterClient twitterClient, AppProperties appProperties) {
         this.twitterClient = twitterClient;
         this.appProperties = appProperties;

@@ -3,6 +3,7 @@ package io.cryptofeeler.app.config;
 import com.github.redouane59.twitter.TwitterClient;
 import com.github.redouane59.twitter.signature.TwitterCredentials;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import io.cryptofeeler.app.feed.twitter.TwitterFeedExtractor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -39,5 +40,10 @@ public class ApplicationConfiguration {
     @Bean
     public TwitterClient twitterClient(TwitterCredentials twitterCredentials) {
         return new TwitterClient(twitterCredentials);
+    }
+
+    @Bean
+    public TwitterFeedExtractor twitterFeedExtractor(TwitterClient twitterClient, AppProperties appProperties) {
+        return new TwitterFeedExtractor(twitterClient, appProperties);
     }
 }

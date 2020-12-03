@@ -8,4 +8,10 @@ public class AppProperties {
 
     @Value("#{new Integer('${twitter.search.limit}')}")
     public int twitterMaxSearchLimit;
+
+    @Value("google.trends.api.explore.url")
+    public String googleTrendsApiExploreUrl;
+
+    @Value("google.trends.api.multiline.url")
+    public String googleTrendsApiMultilineUrl;
 }
