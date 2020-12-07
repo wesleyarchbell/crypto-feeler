@@ -1,5 +1,7 @@
 package io.cryptofeeler.app.feed.google;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.cryptofeeler.app.config.AppProperties;
 import io.cryptofeeler.app.exception.CryptoFeelerException;
 import io.cryptofeeler.app.feed.twitter.TwitterFeedExtractor;
@@ -13,18 +15,19 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.json.JsonParser;
-import org.springframework.boot.json.JsonParserFactory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class GoogleTrendsFeedExtractor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TwitterFeedExtractor.class);
     private AppProperties appProperties;
+
+    private final Gson gson = (new GsonBuilder()).create();
 
     public GoogleTrendsFeedExtractor(AppProperties appProperties) {
         this.appProperties = appProperties;
@@ -37,8 +40,9 @@ public class GoogleTrendsFeedExtractor {
         GoogleTrendsFeed googleTrendsFeed = new GoogleTrendsFeed();
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             String exploreData = getExploreData(searchTerm, httpClient);
-            JsonParser jsonParser = JsonParserFactory.getJsonParser();
-            Map<String, Object> stringObjectMap = jsonParser.parseMap(exploreData.substring(5));
+            Map<String, Object> exploreJson = gson.fromJson(exploreData.substring(5), Map.class);
+            String multilineData = getInterestOverTimeData(exploreJson, httpClient);
+            Map<String, Object> timelineJson = gson.fromJson(multilineData.substring(5), Map.class);
 
         } catch (Exception e) {
             throw new CryptoFeelerException("Failed to extract google trends feed", e);
@@ -61,6 +65,33 @@ public class GoogleTrendsFeedExtractor {
         CloseableHttpResponse response = httpClient.execute(httpGet);
         HttpEntity entity = response.getEntity();
         return EntityUtils.toString(entity);
+    }
+
+    private String getInterestOverTimeData(Map<String, Object> exploreJson, CloseableHttpClient httpClient)
+            throws URISyntaxException, IOException {
+
+        List<Map> widgets = (List<Map>) exploreJson.get("widgets");
+        Optional<Map> timeseries = widgets.stream().filter(i -> i.containsValue("TIMESERIES")).findFirst();
+        if (timeseries.isPresent()) {
+
+            URIBuilder uriBuilder = new URIBuilder(appProperties.googleTrendsApiMultilineUrl);
+            uriBuilder.addParameter("hl", "en-US");
+            uriBuilder.addParameter("tz", "-600");
+
+            Map<String, Object> timeSeriesData = timeseries.get();
+            Object requestData = timeSeriesData.get("request");
+            uriBuilder.addParameter("req", this.gson.toJson(requestData));
+            uriBuilder.addParameter("token", timeSeriesData.get("token").toString());
+            HttpGet httpGet = new HttpGet(uriBuilder.build());
+            httpGet.addHeader("cookie", GoogleTrendsConfig.COOKIE);
+
+            CloseableHttpResponse response = httpClient.execute(httpGet);
+            HttpEntity entity = response.getEntity();
+            return EntityUtils.toString(entity);
+
+        } else {
+            throw new CryptoFeelerException("Could not find time series widget request from explore response.");
+        }
     }
 
 }
