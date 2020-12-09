@@ -2,6 +2,7 @@ package io.cryptofeeler.app.feed.google;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import io.cryptofeeler.app.config.AppProperties;
 import io.cryptofeeler.app.exception.CryptoFeelerException;
 import io.cryptofeeler.app.feed.twitter.TwitterFeedExtractor;
@@ -17,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +27,8 @@ import java.util.Optional;
 public class GoogleTrendsFeedExtractor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TwitterFeedExtractor.class);
+    private static final Type JSON_MAP_TYPE = new TypeToken<Map<String, Object>>() {}.getType();
+
     private AppProperties appProperties;
 
     private final Gson gson = (new GsonBuilder()).create();
@@ -40,9 +44,20 @@ public class GoogleTrendsFeedExtractor {
         GoogleTrendsFeed googleTrendsFeed = new GoogleTrendsFeed();
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             String exploreData = getExploreData(searchTerm, httpClient);
-            Map<String, Object> exploreJson = gson.fromJson(exploreData.substring(5), Map.class);
+
+            Map<String, Object> exploreJson = gson.fromJson(exploreData.substring(5), JSON_MAP_TYPE);
             String multilineData = getInterestOverTimeData(exploreJson, httpClient);
-            Map<String, Object> timelineJson = gson.fromJson(multilineData.substring(5), Map.class);
+            Map<String, Object> timelineJson = gson.fromJson(multilineData.substring(5), JSON_MAP_TYPE);
+
+            Map defaultMap = (Map)timelineJson.get("default");
+            List timeLineData = (List)defaultMap.get("timelineData");
+
+            for (Object i :timeLineData) {
+                Map data = (Map)i;
+                String value = ((List)data.get("value")).get(0).toString();
+                GoogleTrendsFeed.TimeLineEntry timeLineEntry = buildTimeLineEntry(data, value);
+                googleTrendsFeed.timelineData.add(timeLineEntry);
+            }
 
         } catch (Exception e) {
             throw new CryptoFeelerException("Failed to extract google trends feed", e);
@@ -50,6 +65,13 @@ public class GoogleTrendsFeedExtractor {
         long end = System.currentTimeMillis() - start;
         LOGGER.info("End: Extracting google trends feed, took: " + DurationFormatUtils.formatDurationWords(end, false, false));
         return googleTrendsFeed;
+    }
+
+    private GoogleTrendsFeed.TimeLineEntry buildTimeLineEntry(Map data, String value) {
+        return new GoogleTrendsFeed.TimeLineEntry(
+                Long.parseLong(data.get("time").toString()),
+                data.get("formattedTime").toString(),
+                Double.parseDouble(value));
     }
 
     private String getExploreData(String searchTerm, CloseableHttpClient httpClient) throws URISyntaxException, IOException {
@@ -78,7 +100,7 @@ public class GoogleTrendsFeedExtractor {
             uriBuilder.addParameter("hl", "en-US");
             uriBuilder.addParameter("tz", "-600");
 
-            Map<String, Object> timeSeriesData = timeseries.get();
+            Map timeSeriesData = timeseries.get();
             Object requestData = timeSeriesData.get("request");
             uriBuilder.addParameter("req", this.gson.toJson(requestData));
             uriBuilder.addParameter("token", timeSeriesData.get("token").toString());
