@@ -32,3 +32,6 @@ build/
 ### VS Code ###
 .vscode/
 twitter_credentials.json
+
+### UI ###
+**/node_modules
