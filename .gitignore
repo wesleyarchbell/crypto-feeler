@@ -36,3 +36,4 @@ twitter_credentials.json
 ### UI ###
 /src/main/ui/**/node_modules
 /src/main/ui/**/node
+/node
