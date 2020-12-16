@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -26,17 +27,14 @@ public class TwitterFeedExtractor {
         this.appProperties = appProperties;
     }
 
-    public List<TwitterFeed> extractFeed(List<String> searchTerms) {
+    public TwitterFeed extractFeed(String searchTerm) {
         LOGGER.info("Start: Extract twitter feed");
         long start = System.currentTimeMillis();
-
-        List<TwitterFeed> collect = searchTerms.stream()
-                .map(this::getFeed).filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        TwitterFeed feed = this.getFeed(searchTerm);
 
         long end = System.currentTimeMillis() - start;
         LOGGER.info("End: Extract twitter feed, took: " + DurationFormatUtils.formatDurationWords(end, false, false));
-        return collect;
+        return feed;
     }
 
     private TwitterFeed getFeed(String searchTerm) {

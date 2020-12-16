@@ -3,23 +3,28 @@ package io.cryptofeeler.app.config;
 import com.github.redouane59.twitter.TwitterClient;
 import com.github.redouane59.twitter.signature.TwitterCredentials;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import io.cryptofeeler.app.feed.google.GoogleTrendsFeedExtractor;
 import io.cryptofeeler.app.feed.twitter.TwitterFeedExtractor;
+import io.cryptofeeler.app.job.SentimentScheduledJob;
+import io.cryptofeeler.app.nlp.SentimentNLP;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.Properties;
 
 @Configuration
+@EnableScheduling
 public class ApplicationConfiguration {
 
-    @Bean
+    @Bean(name = "tokenizer")
     public StanfordCoreNLP tokenizer() {
         Properties tokenizerProps = new Properties();
         tokenizerProps.setProperty("annotators", "tokenize ssplit");
         return new StanfordCoreNLP(tokenizerProps);
     }
 
-    @Bean
+    @Bean(name = "pipeline")
     public StanfordCoreNLP pipeline() {
         Properties pipelineProps = new Properties();
         pipelineProps.setProperty("annotators", "parse, sentiment");
@@ -45,5 +50,24 @@ public class ApplicationConfiguration {
     @Bean
     public TwitterFeedExtractor twitterFeedExtractor(TwitterClient twitterClient, AppProperties appProperties) {
         return new TwitterFeedExtractor(twitterClient, appProperties);
+    }
+
+    @Bean
+    public GoogleTrendsFeedExtractor googleTrendsFeedExtractor(AppProperties appProperties) {
+        return new GoogleTrendsFeedExtractor(appProperties);
+    }
+
+    @Bean
+    public SentimentScheduledJob sentimentScheduledJob(AppProperties appProperties,
+                                                       TwitterFeedExtractor twitterFeedExtractor,
+                                                       GoogleTrendsFeedExtractor googleTrendsFeedExtractor,
+                                                       SentimentNLP sentimentNLP) {
+        return new SentimentScheduledJob(appProperties, twitterFeedExtractor, googleTrendsFeedExtractor,
+                sentimentNLP);
+    }
+
+    @Bean
+    public SentimentNLP sentimentNLP(StanfordCoreNLP tokenizer, StanfordCoreNLP pipeline) {
+        return new SentimentNLP(tokenizer, pipeline);
     }
 }

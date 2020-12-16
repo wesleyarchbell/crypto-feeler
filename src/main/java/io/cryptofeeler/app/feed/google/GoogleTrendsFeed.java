@@ -7,7 +7,7 @@ public class GoogleTrendsFeed {
 
     public final List<TimeLineEntry> timelineData = new ArrayList();
 
-    static class TimeLineEntry {
+    public static class TimeLineEntry {
         public long time;
         public String formattedTime;
         public double value;

@@ -14,7 +14,6 @@ public class SentimentNLP {
     private StanfordCoreNLP tokenizer;
     private StanfordCoreNLP pipeline;
 
-    @Autowired
     public SentimentNLP(StanfordCoreNLP tokenizer, StanfordCoreNLP pipeline) {
         this.tokenizer = tokenizer;
         this.pipeline = pipeline;

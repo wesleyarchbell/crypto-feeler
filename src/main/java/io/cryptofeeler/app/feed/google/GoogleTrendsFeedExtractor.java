@@ -27,9 +27,10 @@ import java.util.Optional;
 public class GoogleTrendsFeedExtractor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TwitterFeedExtractor.class);
+
     private static final Type JSON_MAP_TYPE = new TypeToken<Map<String, Object>>() {}.getType();
 
-    private AppProperties appProperties;
+    private final AppProperties appProperties;
 
     private final Gson gson = (new GsonBuilder()).create();
 
