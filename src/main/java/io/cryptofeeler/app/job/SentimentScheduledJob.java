@@ -1,6 +1,8 @@
 package io.cryptofeeler.app.job;
 
 import io.cryptofeeler.app.config.AppProperties;
+import io.cryptofeeler.app.feed.coinmarketcap.GlobalMetricsFeed;
+import io.cryptofeeler.app.feed.coinmarketcap.GlobalMetricsFeedExtractor;
 import io.cryptofeeler.app.feed.google.GoogleTrendsFeed;
 import io.cryptofeeler.app.feed.google.GoogleTrendsFeedExtractor;
 import io.cryptofeeler.app.feed.twitter.TwitterFeed;
@@ -20,15 +22,18 @@ public class SentimentScheduledJob {
     private final AppProperties appProperties;
     private final TwitterFeedExtractor twitterFeedExtractor;
     private final GoogleTrendsFeedExtractor googleTrendsFeedExtractor;
+    private final GlobalMetricsFeedExtractor globalMetricsFeedExtractor;
     private final SentimentNLP sentimentNLP;
 
     public SentimentScheduledJob(AppProperties appProperties,
                                  TwitterFeedExtractor twitterFeedExtractor,
                                  GoogleTrendsFeedExtractor googleTrendsFeedExtractor,
+                                 GlobalMetricsFeedExtractor globalMetricsFeedExtractor,
                                  SentimentNLP sentimentNLP) {
         this.appProperties = appProperties;
         this.twitterFeedExtractor = twitterFeedExtractor;
         this.googleTrendsFeedExtractor = googleTrendsFeedExtractor;
+        this.globalMetricsFeedExtractor = globalMetricsFeedExtractor;
         this.sentimentNLP = sentimentNLP;
     }
 
@@ -51,12 +56,16 @@ public class SentimentScheduledJob {
                     .collect(Collectors.toList());
 
             sentiment.forEach(s -> {
-                LOGGER.info("Sentiment for twitter: " + s);
+                LOGGER.info("Sentiment for twitter: {}", s);
             });
 
             GoogleTrendsFeed googleTrendsFeed = googleTrendsFeedExtractor.extractFeed(coin);
-            LOGGER.info("Google trends timeline for {} " + coin);
+            LOGGER.info("Google trends timeline for {} ", coin);
             googleTrendsFeed.timelineData.forEach(i -> LOGGER.info(i.formattedTime + " - " + i.value));
         });
+
+        GlobalMetricsFeed globalMetricsFeed = globalMetricsFeedExtractor.extract();
+        LOGGER.info("BTC Dominance, {}%", globalMetricsFeed.btcDominance);
+        LOGGER.info("ETH Dominance, {}%", globalMetricsFeed.ethDominance);
     }
 }

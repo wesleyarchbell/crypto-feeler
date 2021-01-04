@@ -106,7 +106,6 @@ public class GoogleTrendsFeedExtractor {
             uriBuilder.addParameter("req", this.gson.toJson(requestData));
             uriBuilder.addParameter("token", timeSeriesData.get("token").toString());
             HttpGet httpGet = new HttpGet(uriBuilder.build());
-            httpGet.addHeader("cookie", GoogleTrendsConfig.COOKIE);
 
             CloseableHttpResponse response = httpClient.execute(httpGet);
             HttpEntity entity = response.getEntity();

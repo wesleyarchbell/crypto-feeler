@@ -32,6 +32,7 @@ build/
 ### VS Code ###
 .vscode/
 twitter_credentials.json
+coinmarketcap_credentials.properties
 
 ### UI ###
 /src/main/ui/**/node_modules

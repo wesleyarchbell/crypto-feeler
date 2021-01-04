@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+
 class TwitterFeedExtractorTest {
 
     private static final String CREDENTIALS_PATH = "src/test/resources/twitter_credentials.json";
@@ -26,7 +28,7 @@ class TwitterFeedExtractorTest {
     public void shouldExtractBasicFeed() {
         TweetSearchResponse response = twitterClient.searchForTweetsWithin7days("Bitcoin", 10, null);
         List<Tweet> tweets = response.getTweets();
-        MatcherAssert.assertThat(tweets.size(), Matchers.equalTo(10));
+        assertThat(tweets.size(), Matchers.equalTo(10));
     }
 
 }

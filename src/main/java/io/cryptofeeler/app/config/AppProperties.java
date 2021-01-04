@@ -19,4 +19,7 @@ public class AppProperties {
 
     @Value("#{'${feed.coin.list}'.split(',')}")
     public List<String> feedCoinList;
+
+    @Value("${coinmarketcap.global.metrics.latest.url}")
+    public String coinMarketCapGlobalMetricsLatestUrl;
 }
