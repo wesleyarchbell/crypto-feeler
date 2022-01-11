@@ -12,7 +12,7 @@
 	<artifactId>crypto-feeler</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Crypto Feeler</name>
-	<description>Crypto Feeler - Crypto markets sentiment and feel aggregator</description>
+	<description>Crypto Feeler - Crypto markets sentiment and feel aggregator.</description>
 
 	<properties>
 		<java.version>12</java.version>
